@@ -29,6 +29,6 @@ func (h *hashHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
 
 	err := json.NewEncoder(w).Encode(row)
 	if err != nil {
-		h.logger.Error("failed to write request:", zap.Error(err))
+		h.logger.Error("failed to write response:", zap.Error(err))
 	}
 }
