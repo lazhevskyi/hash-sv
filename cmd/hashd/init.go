@@ -1,13 +1,17 @@
 package main
 
 import (
+	"fmt"
+	"net"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
 
+	grpc2 "hash-sv/internal/grpc"
 	"hash-sv/internal/hash"
 	route "hash-sv/internal/http"
 )
@@ -30,9 +34,25 @@ func NewHttpRouter(service *hash.Service, logger *zap.Logger) http.Handler {
 	return router
 }
 
+func NewGrpcServer(service *hash.Service) *grpc.Server {
+	s := grpc.NewServer()
+	grpc2.RegisterHashServer(s, grpc2.NewServer(service))
+
+	return s
+}
+
+func MustNewNetListener(cfg config) net.Listener {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GrpcPort))
+	if err != nil {
+		panic(fmt.Errorf("failed to listen: %w", err))
+	}
+
+	return lis
+}
+
 func NewHttpServer(handler http.Handler, cfg config) *http.Server {
 	return &http.Server{
-		Addr:    cfg.Addr + ":" + cfg.Port,
+		Addr:    fmt.Sprintf(":%d", cfg.HttpPort),
 		Handler: handler,
 	}
 }

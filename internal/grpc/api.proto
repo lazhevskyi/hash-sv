@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "./grpc";
+
+service Hash {
+  rpc Get(Empty) returns (HashRowResponse);
+}
+
+message Empty {}
+
+message HashRowResponse {
+  string hash = 1;
+  string created_at = 2;
+}

@@ -10,15 +10,15 @@ import (
 func init() {
 	pflag.Bool("debug", true, "")
 	pflag.Duration("hash_ttl", 5*time.Second, "time to regenerate hash")
-	pflag.String("port", "8080", "http server port")
-	pflag.String("addr", "", "http server addr")
+	pflag.Int("http_port", 8080, "http server port")
+	pflag.Int("grpc_port", 8081, "grpc server port")
 }
 
 type config struct {
-	Debug   bool          `mapstructure:"debug"`
-	HashTTL time.Duration `mapstructure:"hash_ttl"`
-	Port    string        `mapstructure:"port"`
-	Addr    string        `mapstructure:"addr"`
+	Debug    bool          `mapstructure:"debug"`
+	HashTTL  time.Duration `mapstructure:"hash_ttl"`
+	HttpPort int           `mapstructure:"http_port"`
+	GrpcPort int           `mapstructure:"grpc_port"`
 }
 
 func mustParseConfig() config {

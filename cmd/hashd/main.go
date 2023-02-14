@@ -27,16 +27,35 @@ func main() {
 	errG, errCtx := errgroup.WithContext(ctx)
 
 	errG.Go(func() error {
+		logger.Info("starting hash updater")
+
 		return service.Run(errCtx)
 	})
 
 	httpServer := NewHttpServer(NewHttpRouter(service, logger), cfg)
 
 	errG.Go(func() error {
+		logger.Info(
+			"starting http server",
+			zap.String("addr", httpServer.Addr),
+		)
+
 		return httpServer.ListenAndServe()
 	})
 
 	errCh := make(chan error)
+
+	listener := MustNewNetListener(cfg)
+	grpcServer := NewGrpcServer(service)
+
+	errG.Go(func() error {
+		logger.Info(
+			"starting grpc server",
+			zap.String("addr", listener.Addr().String()),
+		)
+
+		return grpcServer.Serve(listener)
+	})
 
 	go func() {
 		if err := errG.Wait(); err != nil {
