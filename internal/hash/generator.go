@@ -8,12 +8,12 @@ type UUIDGenerator interface {
 	Generate() UUID
 }
 
-type generator struct{}
+type uuid4Generator struct{}
 
-func NewGenerator() UUIDGenerator {
-	return &generator{}
+func NewUUID4Generator() UUIDGenerator {
+	return &uuid4Generator{}
 }
 
-func (g generator) Generate() UUID {
+func (g uuid4Generator) Generate() UUID {
 	return uuid.New()
 }

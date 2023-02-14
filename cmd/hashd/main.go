@@ -22,7 +22,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	logger := NewLogger(cfg)
-	service := NewHashService(hash.NewMemoryStorage(), hash.NewGenerator(), logger, cfg)
+	service := NewHashService(hash.NewMemoryStorage(), hash.NewUUID4Generator(), logger, cfg)
 
 	errG, errCtx := errgroup.WithContext(ctx)
 
