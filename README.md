@@ -1,10 +1,18 @@
 # hash-sv
 
-Build docker image by  ```make build ``` \
-Run docker container by ```make run``` \
-Environment variables:  ``` HASH_TTL=5m - the time after which the hash will be rebuilt ```
-
-# Task
+## Build Setup 
+```bash 
+     # build docker image by 
+     make build
+      
+     # run docker container by 
+     make run
+     
+     # Environments:
+     HASH_TTL=5m #the time after which the hash will be rebuilt
+    
+```
+## Task
 
 Develop a stateful application containing generated uuid hash in its memory.
 Hash should be recreated every 5 minutes.
