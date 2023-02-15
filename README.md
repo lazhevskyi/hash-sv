@@ -1,6 +1,11 @@
 # hash-sv
 
-# Task 
+Build docker image by  ```make build ``` \
+Run docker container by ```make run``` \
+Environment variables:  ``` HASH_TTL=5m - the time after which the hash will be rebuilt ```
+
+# Task
+
 Develop a stateful application containing generated uuid hash in its memory.
 Hash should be recreated every 5 minutes.
 Application should contain two api servers: gRPC and http.
