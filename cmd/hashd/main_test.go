@@ -46,8 +46,7 @@ func TestGrpcHashServer_Get(t *testing.T) {
 	)
 
 	for _, h := range mustParseHashes(t, testCases) {
-		h := h
-		hashGenerator.EXPECT().Generate().DoAndReturn(func() hash.UUID { return h })
+		hashGenerator.EXPECT().Generate().Return(h)
 	}
 
 	ctx, cancel := context.WithCancel(context.TODO())
@@ -107,8 +106,7 @@ func TestHttpHashServer_Get(t *testing.T) {
 	)
 
 	for _, h := range mustParseHashes(t, testCases) {
-		h := h
-		hashGenerator.EXPECT().Generate().DoAndReturn(func() hash.UUID { return h })
+		hashGenerator.EXPECT().Generate().Return(h)
 	}
 
 	ctx, cancel := context.WithCancel(context.TODO())

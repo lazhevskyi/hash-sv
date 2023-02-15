@@ -23,8 +23,7 @@ func TestUpdater_Run(t *testing.T) {
 	)
 
 	for _, h := range mustParseHashes(t, testCases) {
-		h := h
-		generatorMock.EXPECT().Generate().DoAndReturn(func() UUID { return h })
+		generatorMock.EXPECT().Generate().Return(h)
 	}
 
 	var updatedCh = make(chan struct{})
