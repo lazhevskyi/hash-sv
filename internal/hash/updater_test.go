@@ -2,31 +2,34 @@ package hash
 
 import (
 	"context"
-	"sync"
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
 var testCases = []struct{ hash string }{
-	{
-		hash: "f47ac10b-58cc-4372-0567-0e02b2c3d479",
-	},
-	{
-		hash: "f47ac10b-58cc-f372-8567-0e02b2c3d471",
-	},
+	{"f47ac10b-58cc-4372-0567-0e02b2c3d479"},
+	{"f47ac10b-58cc-f372-8567-0e02b2c3d471"},
 }
 
 func TestUpdater_Run(t *testing.T) {
-	generatorMock := &uuidGeneratorMock{}
-	generatorMock.Set(mustParseHashes(t, testCases))
+	var (
+		ctrl          = gomock.NewController(t)
+		generatorMock = NewMockUUIDGenerator(ctrl)
+	)
+
+	for _, h := range mustParseHashes(t, testCases) {
+		h := h
+		generatorMock.EXPECT().Generate().DoAndReturn(func() UUID { return h })
+	}
 
 	var updatedCh = make(chan struct{})
 
-	storage := newStorageWrapper(NewMemoryStorage(), func() { updatedCh <- struct{}{} })
+	storage := NewStorageFuncWrapper(NewMemoryStorage(), func() { updatedCh <- struct{}{} })
 
 	hashTTL := 500 * time.Millisecond
 
@@ -65,53 +68,4 @@ func mustParseHashes(t *testing.T, testCases []struct{ hash string }) []UUID {
 	}
 
 	return hashes
-}
-
-type uuidGeneratorMock struct {
-	sync.Mutex
-	hashes  []UUID
-	counter int
-}
-
-func (g *uuidGeneratorMock) Set(hashes []UUID) {
-	g.Lock()
-	defer g.Unlock()
-	g.hashes = hashes
-	g.counter = 0
-}
-
-func (g *uuidGeneratorMock) Generate() UUID {
-	if g.counter >= len(g.hashes) {
-		panic("out of hashes")
-	}
-
-	g.counter++
-
-	return g.hashes[g.counter-1]
-}
-
-type storageWrapper struct {
-	storage Storage
-	call    func()
-}
-
-func newStorageWrapper(storage Storage, call func()) Storage {
-	return &storageWrapper{
-		storage: storage,
-		call:    call,
-	}
-}
-
-func (s *storageWrapper) Upsert(row Row) error {
-	if err := s.storage.Upsert(row); err != nil {
-		return err
-	}
-
-	s.call()
-
-	return nil
-}
-
-func (s *storageWrapper) Get() Row {
-	return s.storage.Get()
 }

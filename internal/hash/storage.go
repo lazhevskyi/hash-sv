@@ -39,3 +39,29 @@ func (s *memoryStorage) Get() Row {
 
 	return row
 }
+
+type storageFuncWrapper struct {
+	storage Storage
+	call    func()
+}
+
+func NewStorageFuncWrapper(storage Storage, call func()) Storage {
+	return &storageFuncWrapper{
+		storage: storage,
+		call:    call,
+	}
+}
+
+func (s *storageFuncWrapper) Upsert(row Row) error {
+	if err := s.storage.Upsert(row); err != nil {
+		return err
+	}
+
+	s.call()
+
+	return nil
+}
+
+func (s *storageFuncWrapper) Get() Row {
+	return s.storage.Get()
+}

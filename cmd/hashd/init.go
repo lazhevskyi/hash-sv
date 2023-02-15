@@ -11,9 +11,9 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 
-	grpc2 "hash-sv/internal/grpc"
+	grpcapi "hash-sv/internal/grpc"
 	"hash-sv/internal/hash"
-	route "hash-sv/internal/http"
+	httphandler "hash-sv/internal/http"
 )
 
 func NewHashService(
@@ -29,14 +29,14 @@ func NewHashService(
 
 func NewHttpRouter(service *hash.Service, logger *zap.Logger) http.Handler {
 	router := mux.NewRouter()
-	router.Handle("/hash", route.NewHashHandler(service, logger))
+	router.Handle("/hash", httphandler.NewHashHandler(service, logger))
 
 	return router
 }
 
 func NewGrpcServer(service *hash.Service) *grpc.Server {
 	s := grpc.NewServer()
-	grpc2.RegisterHashServer(s, grpc2.NewServer(service))
+	grpcapi.RegisterHashServer(s, grpcapi.NewServer(service))
 
 	return s
 }

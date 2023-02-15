@@ -5,8 +5,8 @@ import (
 )
 
 type Row struct {
-	Hash      UUID      `json:"hash"`
-	CreatedAt time.Time `json:"created_at"`
+	Hash      UUID
+	CreatedAt time.Time
 }
 
 func NewRow(hash UUID) Row {

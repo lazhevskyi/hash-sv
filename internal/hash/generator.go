@@ -1,3 +1,4 @@
+//go:generate mockgen -source=generator.go --destination=generator_mock.go -package=hash
 package hash
 
 import "github.com/google/uuid"

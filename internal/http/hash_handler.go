@@ -27,7 +27,7 @@ func NewHashHandler(
 func (h *hashHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
 	row := h.service.Get()
 
-	err := json.NewEncoder(w).Encode(row)
+	err := json.NewEncoder(w).Encode(NewHashRowResponse(row.Hash, row.CreatedAt))
 	if err != nil {
 		h.logger.Error("failed to write response:", zap.Error(err))
 	}
