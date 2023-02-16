@@ -82,7 +82,12 @@ func TestGrpcHashServer_Get(t *testing.T) {
 
 	client := grpcapi.NewHashClient(conn)
 	for _, tc := range testCases {
-		<-updatedCh
+		select {
+		case <-updatedCh:
+		case <-time.After(2 * cfg.HashTTL):
+			assert.Fail(t, "did not receive updated signal")
+		}
+
 		response, err := client.Get(ctx, &grpcapi.Empty{})
 		assert.Nil(t, err, "client get request")
 		assert.Equal(t, tc.hash, response.Hash)
@@ -120,10 +125,17 @@ func TestHttpHashServer_Get(t *testing.T) {
 	server := httptest.NewServer(NewHttpRouter(service, logger))
 
 	for _, tc := range testCases {
-		<-updatedCh
+		select {
+		case <-updatedCh:
+		case <-time.After(2 * cfg.HashTTL):
+			assert.Fail(t, "did not receive updated signal")
+		}
+
 		response, err := http.Get(server.URL + "/hash")
 		assert.Nil(t, err, "http client get request")
+
 		assert.Equal(t, http.StatusOK, response.StatusCode)
+
 		var resp http2.HashRowResponse
 		err = json.NewDecoder(response.Body).Decode(&resp)
 		assert.Nil(t, err, "decoding hash row")
