@@ -1,6 +1,9 @@
 package hash
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
 type Storage interface {
 	StorageGetter
@@ -8,11 +11,11 @@ type Storage interface {
 }
 
 type StorageGetter interface {
-	Get() Row
+	Get(ctx context.Context) Row
 }
 
 type StorageUpdater interface {
-	Upsert(row Row) error
+	Upsert(ctx context.Context, row Row) error
 }
 
 type memoryStorage struct {
@@ -24,7 +27,7 @@ func NewMemoryStorage() Storage {
 	return &memoryStorage{}
 }
 
-func (s *memoryStorage) Upsert(row Row) error {
+func (s *memoryStorage) Upsert(_ context.Context, row Row) error {
 	s.Lock()
 	defer s.Unlock()
 	s.row = row
@@ -32,7 +35,7 @@ func (s *memoryStorage) Upsert(row Row) error {
 	return nil
 }
 
-func (s *memoryStorage) Get() Row {
+func (s *memoryStorage) Get(_ context.Context) Row {
 	s.RLock()
 	row := s.row
 	s.RUnlock()
@@ -52,8 +55,8 @@ func NewStorageFuncWrapper(storage Storage, call func()) Storage {
 	}
 }
 
-func (s *storageFuncWrapper) Upsert(row Row) error {
-	if err := s.storage.Upsert(row); err != nil {
+func (s *storageFuncWrapper) Upsert(ctx context.Context, row Row) error {
+	if err := s.storage.Upsert(ctx, row); err != nil {
 		return err
 	}
 
@@ -62,6 +65,6 @@ func (s *storageFuncWrapper) Upsert(row Row) error {
 	return nil
 }
 
-func (s *storageFuncWrapper) Get() Row {
-	return s.storage.Get()
+func (s *storageFuncWrapper) Get(ctx context.Context) Row {
+	return s.storage.Get(ctx)
 }

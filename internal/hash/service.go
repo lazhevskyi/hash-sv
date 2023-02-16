@@ -17,8 +17,8 @@ func NewService(
 	}
 }
 
-func (s *Service) Get() Row {
-	return s.storage.Get()
+func (s *Service) Get(ctx context.Context) Row {
+	return s.storage.Get(ctx)
 }
 
 func (s *Service) Run(ctx context.Context) error {

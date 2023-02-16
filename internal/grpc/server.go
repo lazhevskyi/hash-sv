@@ -18,8 +18,8 @@ func NewServer(service *hash.Service) *Server {
 	}
 }
 
-func (s *Server) Get(context.Context, *Empty) (*HashRowResponse, error) {
-	hashRow := s.service.Get()
+func (s *Server) Get(ctx context.Context, _ *Empty) (*HashRowResponse, error) {
+	hashRow := s.service.Get(ctx)
 
 	return &HashRowResponse{
 		Hash:      hashRow.Hash.String(),

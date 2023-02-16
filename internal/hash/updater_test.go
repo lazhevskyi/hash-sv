@@ -50,7 +50,7 @@ func TestUpdater_Run(t *testing.T) {
 		case <-ticker.C:
 			assert.Fail(t, "did not obtain hash regeneration signal")
 		case <-updatedCh:
-			row := storage.Get()
+			row := storage.Get(ctx)
 			assert.Equal(t, testCase.hash, row.Hash.String())
 		}
 	}

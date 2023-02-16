@@ -24,8 +24,8 @@ func NewHashHandler(
 	}
 }
 
-func (h *hashHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
-	row := h.service.Get()
+func (h *hashHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	row := h.service.Get(r.Context())
 
 	err := json.NewEncoder(w).Encode(NewHashRowResponse(row.Hash, row.CreatedAt))
 	if err != nil {

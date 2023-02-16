@@ -34,7 +34,7 @@ func NewUpdater(
 }
 
 func (u *updater) Run(ctx context.Context) error {
-	if err := u.update(); err != nil {
+	if err := u.update(ctx); err != nil {
 		return fmt.Errorf("couln`t update hash: %w", err)
 	}
 
@@ -45,19 +45,19 @@ func (u *updater) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			if err := u.update(); err != nil {
+			if err := u.update(ctx); err != nil {
 				return fmt.Errorf("couln`t update hash: %w", err)
 			}
 		}
 	}
 }
 
-func (u *updater) update() error {
+func (u *updater) update(ctx context.Context) error {
 	u.logger.Debug("going update hash")
 
 	row := NewRow(u.generator.Generate())
 
-	if err := u.storage.Upsert(row); err != nil {
+	if err := u.storage.Upsert(ctx, row); err != nil {
 		return fmt.Errorf("couln`t upsert hash: %w", err)
 	}
 
